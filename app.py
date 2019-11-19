@@ -3,6 +3,8 @@ import os
 import re
 import sys
 import cv2
+import base64
+import numpy as np
 from PIL import ImageFile
 from PIL import Image
 from flask import Flask, request, jsonify
@@ -29,11 +31,15 @@ def extract_date_from_img():
     Returns:
         date -- returns date in YYYY-MM-DD format
     """
-    img = request.files.get("image")
 
-    # Get the path of uploaded image and read it
-    image = Image.open(img)
-    # image = cv2.imread(img, 0)
+    # get raw data
+    data = request.get_json()
+    bs64_string = data["base_64_image_content"]
+
+    # Decode base64 image and read it
+    # image = Image.open(base64.b64decode(bs64_string))
+    nparr = np.fromstring(base64.b64decode(bs64_string), np.uint8)
+    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
     # Use pytesseract to extract text from image
     text = pytesseract.image_to_string(image, lang="eng")
