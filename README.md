@@ -7,5 +7,8 @@
 
 ## Results -
 
+## Actual receipt image
+![](actual-receipt.png)
+
 ### Testing using Postman
 ![](results-postman.png)
