@@ -15,7 +15,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def home():
     return "Please visit /extract_date to view working"
 
