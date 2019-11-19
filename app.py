@@ -100,4 +100,4 @@ def extract_date_from_img():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
