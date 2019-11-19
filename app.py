@@ -9,7 +9,7 @@ from PIL import ImageFile
 from PIL import Image
 from flask import Flask, request, jsonify
 import pytesseract
-pytesseract.pytesseract.tesseract_cmd = '../Automated-Exam-Evaluation/scripts/Tesseractengine/tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd = '/app/.apt/usr/bin/tesseract'
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 app = Flask(__name__)
