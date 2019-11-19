@@ -15,9 +15,24 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 app = Flask(__name__)
 
 
-@app.route("/", methods=["GET"])
-def home():
-    return "Please visit /extract_date to view working"
+@app.errorhandler(404)
+def not_found(error):
+    resp = jsonify({
+        u'status': 404,
+        u'message': u'Resource not found'
+    })
+    resp.status_code = 404
+    return resp
+
+
+@app.route('/')
+def api_root():
+    resp = jsonify({
+        u'status': 200,
+        u'message': u"Please visit /extract_date to view working"
+    })
+    resp.status_code = 200
+    return resp
 
 
 @app.route("/extract_date", methods=['POST'])
