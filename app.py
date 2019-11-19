@@ -7,7 +7,7 @@ import base64
 import numpy as np
 from PIL import ImageFile
 from PIL import Image
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import pytesseract
 pytesseract.pytesseract.tesseract_cmd = '../Automated-Exam-Evaluation/scripts/Tesseractengine/tesseract.exe'
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -35,7 +35,12 @@ def api_root():
     return resp
 
 
-@app.route("/extract_date", methods=['POST'])
+# @app.route('/test', methods=['GET'])
+# def test():
+#     return render_template('upload_form.html', landing_page='extract_date')
+
+
+@app.route("/extract_date", methods=['GET', 'POST'])
 def extract_date_from_img():
     """
     This funciton takes in an image, and extracts date from it
@@ -50,6 +55,9 @@ def extract_date_from_img():
     # get raw data
     data = request.get_json()
     bs64_string = data["base_64_image_content"]
+
+    # print(request.form.get('bs64_string'))
+    #bs64_string = request.form.get('bs64_string')
 
     # Decode base64 image and read it
     # image = Image.open(base64.b64decode(bs64_string))
