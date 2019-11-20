@@ -1,1 +1,6 @@
 Flask
+gunicorn
+numpy
+opencv-python
+pillow
+pytesseract
