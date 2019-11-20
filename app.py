@@ -111,11 +111,12 @@ def format_date(date):
     Returns:
         unified date in YYYY-MM-DD format
     """
-
-    oldformat = dateutil.parser.parse(date)
-    datetimeobject = datetime.strptime(str(oldformat), '%Y-%m-%d  %H:%M:%S')
-    newformat = datetimeobject.strftime('%Y-%m-%d')
-    return newformat
+    try:
+        oldformat = dateutil.parser.parse(date, fuzzy=True)
+        newformat = oldformat.strftime('%Y-%m-%d')
+        return newformat
+    except ValueError:
+        pass
 
 
 if __name__ == '__main__':
