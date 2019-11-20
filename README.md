@@ -18,7 +18,7 @@ To view working, please visit the testing section below.
 ### Testing using Postman
 
 #### 1. Local
-![](results/results-postman.png)
+![](results/results-local.png)
 
 #### 2. Heroku
 ![](results/results-heroku-1.png)
