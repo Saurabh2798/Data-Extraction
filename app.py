@@ -1,4 +1,6 @@
 # imports
+from datetime import datetime
+import dateutil.parser
 import os
 import re
 import sys
@@ -12,9 +14,10 @@ import pytesseract
 pytesseract.pytesseract.tesseract_cmd = '/app/.apt/usr/bin/tesseract'
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
+# create flask app
 app = Flask(__name__)
 
-
+# error handler
 @app.errorhandler(404)
 def not_found(error):
     resp = jsonify({
@@ -24,7 +27,7 @@ def not_found(error):
     resp.status_code = 404
     return resp
 
-
+# root
 @app.route('/')
 def api_root():
     resp = jsonify({
@@ -34,12 +37,7 @@ def api_root():
     resp.status_code = 200
     return resp
 
-
-# @app.route('/test', methods=['GET'])
-# def test():
-#     return render_template('upload_form.html', landing_page='extract_date')
-
-
+# /extract_date
 @app.route("/extract_date", methods=['GET', 'POST'])
 def extract_date_from_img():
     """
@@ -56,11 +54,7 @@ def extract_date_from_img():
     data = request.get_json()
     bs64_string = data["base_64_image_content"]
 
-    # print(request.form.get('bs64_string'))
-    #bs64_string = request.form.get('bs64_string')
-
     # Decode base64 image and read it
-    # image = Image.open(base64.b64decode(bs64_string))
     nparr = np.fromstring(base64.b64decode(bs64_string), np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
@@ -91,20 +85,37 @@ def extract_date_from_img():
     regex5 = months + separators + days + separators + years
     regex6 = years + separators + days + separators + days
 
-    # regex7 = days + months + separators + years # matches date types 09Jul-19
-    # regex8 = months + days + separators + years # matches date types Jun19'19
-
-    # + regex7 + "|" + regex8+
+    # match any of the above regexes
     regexToMatch = "(" + regex1 + "|" + regex2 + "|" + regex3 + \
         "|" + regex4 + "|" + regex5 + "|" + regex6 + "|" + ")"
 
+    # find above regex patterns
     match = re.findall(regexToMatch, text)
+
+    # iterate over the tuples and extract proper dates, exclude remaining
     for tup in set(match):
         for elem in tup:
             if(len(elem) > 6):
-                return jsonify({'date': str(elem)})
-
+                formatted_date = format_date(elem)
+                return jsonify({'date': str(formatted_date)})
     return jsonify({'date': str('null')})
+
+
+def format_date(date):
+    """
+    This function converts date to the required output format
+
+    Arguments:
+        date -- date as detected by OCR + regex
+
+    Returns:
+        unified date in YYYY-MM-DD format
+    """
+
+    oldformat = dateutil.parser.parse(date)
+    datetimeobject = datetime.strptime(str(oldformat), '%Y-%m-%d  %H:%M:%S')
+    newformat = datetimeobject.strftime('%Y-%m-%d')
+    return newformat
 
 
 if __name__ == '__main__':
