@@ -4,3 +4,4 @@ numpy
 opencv-python-headless
 pillow
 pytesseract
+python-dateutil
