@@ -83,11 +83,24 @@ def extract_date_from_img():
 
     # to match m <sep> dd <sep> yyyy
     regex5 = months + separators + days + separators + years
+
+    # to match yyyy <sep> dd <sep> mm / yyyy <sep> mm <sep> dd
     regex6 = years + separators + days + separators + days
 
+    regex7 = "\w+\s\d+,\s\d+"  # for dates like Sep 29, 2019 #
+    regex8 = "\d+\-\w+\-\d+"  # 29-10-2018
+    regex9 = "\d+\/\w+\/\d+"  # 29/May/1998
+    regex10 = "\w+\s+\d+\.\s+\d+"  # May 29. 2019
+    regex11 = "\w+\'\d+"  # Jun19'19
+    regex12 = "\d+\s+\w+\'\d+"  # 20 Jun'19
+
     # match any of the above regexes
-    regexToMatch = "(" + regex1 + "|" + regex2 + "|" + regex3 + \
-        "|" + regex4 + "|" + regex5 + "|" + regex6 + "|" + ")"
+    regexToMatch = "(" + regex1 + "|" + regex2 + "|" + regex3 + "|" + regex4 + "|" + regex5 + \
+        "|" + regex6 + "|" + regex7 + "|" + regex8 + \
+        "|" + regex9 + "|" + regex10 + "|" + ")"
+
+    # regexToMatch = "(" + regex1 + "|" + regex2 + "|" + regex3 + \
+    #     "|" + regex4 + "|" + regex5 + "|" + regex6 + "|" + ")"
 
     # find above regex patterns
     match = re.findall(regexToMatch, text)
@@ -112,7 +125,9 @@ def format_date(date):
         unified date in YYYY-MM-DD format
     """
     try:
-        oldformat = dateutil.parser.parse(date, fuzzy=True)
+        oldformat = dateutil.parser.parse(date)
+        datetimeobject = datetime.strptime(
+            str(oldformat), '%Y-%m-%d  %H:%M:%S')
         newformat = oldformat.strftime('%Y-%m-%d')
         return newformat
     except ValueError:
