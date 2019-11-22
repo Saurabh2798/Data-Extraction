@@ -5,6 +5,7 @@ The api is live at: https://date-extract-api.herokuapp.com/
 To view working, please visit the testing section below.
 
 ## Approach used -
+  - Preprocessed image using basic image processing operations like scaling and applying unsharp mask to it
   - Used pytesseract to detect text from images
   - used regex for extracting all the possible date formats in the detected text
   - used Flask to serve the app

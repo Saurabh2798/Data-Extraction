@@ -11,6 +11,8 @@ from PIL import ImageFile
 from PIL import Image
 from flask import Flask, request, jsonify, render_template
 import pytesseract
+
+# path to tesseract on heroku
 pytesseract.pytesseract.tesseract_cmd = '/app/.apt/usr/bin/tesseract'
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -32,7 +34,7 @@ def not_found(error):
 def api_root():
     resp = jsonify({
         u'status': 200,
-        u'message': u"Please visit /extract_date to view working"
+        u'message': u"Please send a POST request to /extract_date to view working"
     })
     resp.status_code = 200
     return resp
@@ -58,8 +60,17 @@ def extract_date_from_img():
     nparr = np.fromstring(base64.b64decode(bs64_string), np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-    # Use pytesseract to extract text from image
-    text = pytesseract.image_to_string(image, lang="eng")
+    # some preprocessing before passing it through tesseract
+    # upscale the image
+    resized_image = cv2.resize(image, (1191, 2000))
+
+    # unsharp mask
+    gaussian_3 = cv2.GaussianBlur(resized_image, (9, 9), 10.0)
+    unsharp_image = cv2.addWeighted(
+        resized_image, 1.3, gaussian_3, -0.7, 0, image)
+
+    # Use pytesseract to extract text from the processed image
+    text = pytesseract.image_to_string(unsharp_image, lang="eng")
 
     # use regex to find various date patterns
     regex7 = "\w{3}\s\d+,\s\d+"  # for dates like Sep 29, 2019
@@ -79,6 +90,8 @@ def extract_date_from_img():
 
     # iterate over the matches and extract proper dates, exclude remaining
     for elem in match:
+
+        # filter out date values which are not possible
         if(len(elem) > 6):
             format_date(elem)
             formatted_date = format_date(elem)
@@ -97,10 +110,16 @@ def format_date(date):
         unified date in YYYY-MM-DD format
     """
     try:
+
+        # parse the date received
         oldformat = dateutil.parser.parse(date)
+
+        # strip time out of it
         datetimeobject = datetime.strptime(
             str(oldformat), '%Y-%m-%d  %H:%M:%S')
         newformat = oldformat.strftime('%Y-%m-%d')
+
+        # return this date in YYYY-MM-DD format
         return newformat
     except ValueError:
         pass
