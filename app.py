@@ -41,13 +41,13 @@ def api_root():
 @app.route("/extract_date", methods=['GET', 'POST'])
 def extract_date_from_img():
     """
-    This funciton takes in an image, and extracts date from it
+    This function takes in an image, and extracts date from it
 
     Arguments:
         img -- The input image for which date needs to be extracted
 
     Returns:
-        date -- returns date in YYYY-MM-DD format
+        date -- returns date in YYYY-MM-DD, null is not identified format
     """
 
     # get raw data
@@ -84,14 +84,6 @@ def extract_date_from_img():
             formatted_date = format_date(elem)
             return jsonify({'date': str(formatted_date)})
     return jsonify({'date': str('null')})
-
-    # # iterate over the tuples and extract proper dates, exclude remaining
-    # for tup in set(match):
-    #     for elem in tup:
-    #         if(len(elem) > 6):
-    #             formatted_date = format_date(elem)
-    #             return jsonify({'date': str(formatted_date)})
-    # return jsonify({'date': str('null')})
 
 
 def format_date(date):
