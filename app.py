@@ -96,7 +96,7 @@ def extract_date_from_img():
             format_date(elem)
             formatted_date = format_date(elem)
             return jsonify({'date': str(formatted_date)})
-    return jsonify({'date': str('null')})
+    return jsonify({'date': None})
 
 
 def format_date(date):
