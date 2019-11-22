@@ -62,56 +62,36 @@ def extract_date_from_img():
     text = pytesseract.image_to_string(image, lang="eng")
 
     # use regex to find various date patterns
-    monthsShort = "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec"
-    monthsLong = "January|February|March|April|May|June|July|August|September|October|November|December"
-    monthSingleDigit = "\d{1}"
-    months = "(" + monthsShort + "|" + monthsLong + \
-        "|" + monthSingleDigit + "|" + ")"
-    separators = "[,'/-]"
-    days = "\d{2}"
-    years = "(" + "\d{4}" + "|" + "\d{2}" + "|" + ")"
-
-    regex1 = months + separators + days + separators + years
-
-    # to match dd <sep> mm <sep> yyyy / mm <sep> dd <sep> yyyy
-    regex2 = days + separators + months + separators + years
-
-    regex3 = days + separators + days + separators + years
-
-    # to match dd <sep> mm <sep> yy
-    regex4 = days + separators + days + separators + days
-
-    # to match m <sep> dd <sep> yyyy
-    regex5 = months + separators + days + separators + years
-
-    # to match yyyy <sep> dd <sep> mm / yyyy <sep> mm <sep> dd
-    regex6 = years + separators + days + separators + days
-
-    regex7 = "\w+\s\d+,\s\d+"  # for dates like Sep 29, 2019 #
-    regex8 = "\d+\-\w+\-\d+"  # 29-10-2018
-    regex9 = "\d+\/\w+\/\d+"  # 29/May/1998
-    regex10 = "\w+\s+\d+\.\s+\d+"  # May 29. 2019
-    regex11 = "\w+\'\d+"  # Jun19'19
-    regex12 = "\d+\s+\w+\'\d+"  # 20 Jun'19
+    regex7 = "\w{3}\s\d+,\s\d+"  # for dates like Sep 29, 2019
+    regex8 = "\d+\-\d+\-\d+"  # 29-10-2018
+    regex9 = "\d+\/\w{3}\/\d+"  # 29/May/1998
+    regex10 = "\w{3}\s\d+\.\s\d+"  # May 29. 2019
+    regex11 = "\w{3}\d+\'\d+"  # Jun19'19
+    regex12 = "\d+\s\w+\'\d+"  # 20 Jun'19
+    regex13 = "\w+\s\d+,\d+"  # JANUARY 30,2018
+    regex14 = "\d+\/\d+\/\d+"  # 29/10/2018, 9/10/2018
 
     # match any of the above regexes
-    regexToMatch = "(" + regex1 + "|" + regex2 + "|" + regex3 + "|" + regex4 + "|" + regex5 + \
-        "|" + regex6 + "|" + regex7 + "|" + regex8 + \
-        "|" + regex9 + "|" + regex10 + "|" + ")"
-
-    # regexToMatch = "(" + regex1 + "|" + regex2 + "|" + regex3 + \
-    #     "|" + regex4 + "|" + regex5 + "|" + regex6 + "|" + ")"
-
-    # find above regex patterns
+    regexToMatch = "|".join(
+        [regex7, regex8, regex9, regex10, regex11, regex12, regex14, regex13])
     match = re.findall(regexToMatch, text)
+    #print("match: ", match)
 
-    # iterate over the tuples and extract proper dates, exclude remaining
-    for tup in set(match):
-        for elem in tup:
-            if(len(elem) > 6):
-                formatted_date = format_date(elem)
-                return jsonify({'date': str(formatted_date)})
+    # iterate over the matches and extract proper dates, exclude remaining
+    for elem in match:
+        if(len(elem) > 6):
+            format_date(elem)
+            formatted_date = format_date(elem)
+            return jsonify({'date': str(formatted_date)})
     return jsonify({'date': str('null')})
+
+    # # iterate over the tuples and extract proper dates, exclude remaining
+    # for tup in set(match):
+    #     for elem in tup:
+    #         if(len(elem) > 6):
+    #             formatted_date = format_date(elem)
+    #             return jsonify({'date': str(formatted_date)})
+    # return jsonify({'date': str('null')})
 
 
 def format_date(date):
